@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
 import { 
   StyleSheet, 
   Text, 
@@ -9,18 +9,24 @@ import {
   FlatList, 
   Alert 
 } from 'react-native';
-import { requestPost } from '../api/api';
+import { saveNewSale, updateSale } from '../services/salesService'; 
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MONTHS, converterNumberToMonth } from '../utils/utils';
 
-const MONTHS = [
-  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-];
+export default function NewSaleScreen({ route, navigation }) {
+  const saleToEdit = route.params?.sale || null;
+  const isEditing = !!saleToEdit;
 
-export default function NewSaleScreen() {
   const [value, setValue] = useState('');
   const [month, setMonth] = useState('');
-  const [visibleModal, setModalVisivel] = useState(false);
+  const [visibleModal, setVisibleModal] = useState(false);
+
+  useEffect(() => {
+    if (isEditing && saleToEdit) {
+      setValue(String(saleToEdit.value));
+      setMonth(converterNumberToMonth(saleToEdit.month));
+    }
+  }, [saleToEdit]);
 
   const handleSave = async () => {
     if (!value || !month) {
@@ -28,34 +34,41 @@ export default function NewSaleScreen() {
       return;
     }
 
-  try{
-	  const monthNumber = MONTHS.indexOf(month) + 1;
-	  const newSale = {
-		  month: monthNumber,
-		  value: parseFloat(value.replace(',', '.')),
-	  };
-	  const response = await requestPost('sales', newSale);
 
-	  console.log('Venda Cadastrada:', response);
-	  Alert.alert('Sucesso', `Venda de R$ ${value} em ${month} cadastrada!`);
-	  } catch (error) {
-		  console.error("====== ERRO DETALHADO ======");
-		  console.error("Mensagem:", error.message);
-		  console.error("Objeto do erro:", JSON.stringify(error, null, 2));
-		  console.error("============================");
-		  Alert.alert('Erro de Conexão', error.message);}
-    
-    // Limpar campos
-    setValue('');
-    setMonth('');
+    const valueToSend = value;
+    const monthToSend = month;
+
+    try {
+      if (isEditing) {
+        const updatedFields = {
+          month: monthToSend, 
+          value: valueToSend
+        };
+        
+        await updateSale(saleToEdit._id, updatedFields);
+        Alert.alert('Sucesso', 'Venda atualizada com sucesso!');
+      } else {
+        
+        await saveNewSale(monthToSend, valueToSend);
+        Alert.alert('Sucesso', `Venda de R$ ${valueToSend} em ${monthToSend} cadastrada!`);
+      }
+
+      setValue('');
+      setMonth('');
+      
+      navigation.goBack(); 
+      
+    } catch (error) {
+      Alert.alert('Erro', error.message || 'Não foi possível salvar.');
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.form}>
-        <Text style={styles.title}>Cadastrar Venda</Text>
-
-        {/* Campo de Valor */}
+        <Text style={styles.title}>{isEditing ? 'Editar Venda' : 'Cadastrar Venda'}</Text>
+        
+        
         <Text style={styles.label}>Valor da Venda (R$)</Text>
         <TextInput
           style={styles.input}
@@ -66,43 +79,44 @@ export default function NewSaleScreen() {
           onChangeText={setValue}
         />
 
-        {/* Campo de Mês */}
+       
         <Text style={styles.label}>Mês da Venda</Text>
         <TouchableOpacity 
           style={styles.selectButton} 
-          onPress={() => setModalVisivel(true)}
+          onPress={() => setVisibleModal(true)}
         >
           <Text style={month ? styles.selectButtonText : styles.placeholderText}>
             {month || 'Selecione o mês'}
           </Text>
         </TouchableOpacity>
 
-        {/* Botão de Enviar */}
+        
         <TouchableOpacity style={styles.button} onPress={handleSave}>
-          <Text style={styles.buttonText}>Salvar Venda</Text>
+          <Text style={styles.buttonText}>{isEditing ? 'Salvar Alterações' : 'Salvar Venda'}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Modal para Seleção de Mês */}
+     
       <Modal
         animationType="slide"
         transparent={true}
         visible={visibleModal}
-        onRequestClose={() => setModalVisivel(false)}
+        onRequestClose={() => setVisibleModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { height: 450 }]}> 
             <Text style={styles.modalTitle}>Selecione o Mês</Text>
             
             <FlatList
               data={MONTHS}
               keyExtractor={(item) => item}
+              contentContainerStyle={{ paddingBottom: 20 }}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.modalItem}
                   onPress={() => {
                     setMonth(item);
-                    setModalVisivel(false);
+                    setVisibleModal(false);
                   }}
                 >
                   <Text style={styles.modalItemText}>{item}</Text>
@@ -112,7 +126,7 @@ export default function NewSaleScreen() {
 
             <TouchableOpacity 
               style={styles.closeButton} 
-              onPress={() => setModalVisivel(false)}
+              onPress={() => setVisibleModal(false)}
             >
               <Text style={styles.closeButtonText}>Cancelar</Text>
             </TouchableOpacity>
@@ -190,7 +204,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  // Estilos do Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -202,7 +215,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
     paddingTop: 20,
-    maxHeight: '70%',
   },
   modalTitle: {
     fontSize: 18,

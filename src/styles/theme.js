@@ -1,28 +1,26 @@
 export const colors = {
-	primary: '#1a1a2e',       // azul escuro — cor principal
-	secondary: '#16213e',     // azul médio — fundos de cards
-	accent: '#0f3460',        // azul destaque — botões primários
-	accentGreen: '#4ade80',   // verde — aprovado / sucesso
+	primary: '#1a1a2e',       
+	secondary: '#16213e',     
+	accent: '#0f3460',        
+	accentGreen: '#4ade80',   
 
-	// Backgrounds
-	background: '#ffffff',    // fundo geral das telas
-	card: '#cdd0f2',          // fundo de cards
-	surface: '#16213e',       // superfície elevada
+	
+	background: '#ffffff',    
+	card: '#cdd0f2',          
+	surface: '#16213e',
 
-	// Textos
-	textPrimary: '#000000',   // texto principal (claro)
-	textSecondary: '#94a3b8', // texto secundário (cinza)
-	textMuted: '#64748b',     // texto apagado
+	
+	textPrimary: '#000000',   
+	textSecondary: '#94a3b8',
+	textMuted: '#64748b',
 
-	// Status — consistente com o web
-	success: '#4ade80',       // aprovado
+	success: '#4ade80',
 	successBg: '#14532d',
-	error: '#f87171',         // reprovado
+	error: '#f87171',
 	errorBg: '#7f1d1d',
-	warning: '#fbbf24',       // pendente / correção
+	warning: '#fbbf24',
 	warningBg: '#78350f',
 
-	// Bordas
 	border: '#2d2d4e',
 	borderLight: '#3d3d5e',
 };
@@ -49,4 +47,25 @@ export const fontSize = {
 	lg: 20,
 	xl: 24,
 	xxl: 28,	
+}
+
+export const buttonSizes = {
+    sm: {
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: 6,
+      fontSize: 14,
+    },
+    md: {
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 8,
+      fontSize: 16,
+    },
+    lg: {
+      paddingVertical: 16,
+      paddingHorizontal: 24,
+      borderRadius: 10,
+      fontSize: 18,
+    },
 }

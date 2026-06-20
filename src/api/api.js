@@ -18,7 +18,7 @@ async function baseRequest(path, options = {}) {
 }
 
 // 1. Função específica para requisições GET
-async function requestGet(path, headers = {}) {
+export async function requestGet(path, headers = {}) {
   return baseRequest(path, {
     method: 'GET',
     headers: {
@@ -29,7 +29,7 @@ async function requestGet(path, headers = {}) {
 }
 
 // 2. Função específica para requisições POST
-async function requestPost(path, body, headers = {}) {
+export async function requestPost(path, body, headers = {}) {
 	console.log("DADOS ENVIADOS NO BODY:", JSON.stringify(body));
   return baseRequest(path, {
     method: 'POST',
@@ -41,4 +41,22 @@ async function requestPost(path, body, headers = {}) {
   });
 }
 
-export { API_URL, requestGet, requestPost };
+export async function requestDelete(saleId) {
+  if (!saleId) throw new Error('ID da venda é obrigatório para exclusão.');
+  
+  // Faz a chamada para: /sales/id_da_venda
+  return await baseRequest(`sales/${saleId}`, {
+    method: 'DELETE',	  
+  });
+}
+// Procure por requestUpdate no seu api.js e deixe exatamente assim:
+export async function requestUpdate(path, body, headers = {}) {
+  return baseRequest(path, {
+    method: 'PUT', // mude para 'PATCH' se a sua API Express usar app.patch
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    body: JSON.stringify(body),
+  });
+}
