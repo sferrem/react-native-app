@@ -27,6 +27,6 @@ Antes de começar, você vai precisar ter instalado em sua máquina:
 
 1. **Clone o repositório:**
    ```bash
-   git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
+   git clone [https://github.com/sferrem/react-native-app](https://github.com/sferrem/react-native-app)
 
 O projeto vem configurado com a API remota pública,porém se você instalar a local precisará mudar a URL no arquio api.js.
